@@ -89,7 +89,7 @@ class TaskConfig(object):
 class ConfigFile(object):
     def __init__(self) -> None:
         # 读取json文件
-        self.con = TaskConfig.read_json()
+        self.con = TaskConfig('', False, {}).read_json()
         json_con = {}
         for name, values in self.con.items():
             task_config = TaskConfig(name=name, enable=values[Tcpc.ENABLE], settings=values[Tcpc.SETTINGS])

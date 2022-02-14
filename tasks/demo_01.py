@@ -10,11 +10,10 @@
 
 from apscheduler.triggers.interval import IntervalTrigger
 
-
 import time
 
-# 必须以 tr 命名
-tr = IntervalTrigger(seconds=2)
+# 必须以 tr 命名, 具体规则自定
+tr = IntervalTrigger(seconds=1)
 
 
 '''
@@ -22,10 +21,11 @@ Your code here
 '''
 
 
-# 必须以task命名
-def task(settings:dict={}):
+# 必须以task命名, settings必须以此命名
+def task(settings:dict):
     '''
     此tasks的入口\n
-    settings来源于配置文件中的settings'''
+    settings来源于配置文件中的settings
+    '''
     print(time.time())
     print(f'配置参数:{settings}')

@@ -8,9 +8,9 @@
 
 class Version(object):
     # 版本号，如果带有beta字符则为测试版
-    VERSION = '0.1_beta'
+    VERSION = '0.2_beta'
     # 发布日期 年-月-日
-    RELEASE = '2022-1-23'
+    RELEASE = '2022-2-14'
 
     # 横幅
     BANNER = r"""
@@ -48,7 +48,7 @@ class Helper(object):
 
 class TasksHelper(Helper):
     '''Tasks帮助'''
-    # pass
+    TASK_FORM = r'Task任务文件(.py)中，任务入口必须为 settings 函数，定时器必须为 tr，参数从配置文件中传入(请参考示例Task)。'
     
 
 
