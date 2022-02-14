@@ -6,3 +6,4 @@ temp/
 .DS_Store
 .localized
 *.log
+log/
