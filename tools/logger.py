@@ -19,7 +19,7 @@ __log_path = './log/applog.log'
 if not exists('./log'):
     mkdir('./log')
 
-__1M = 1048576
+MB = 1048576
 
 # 记录器
 logger = logging.getLogger('applog')
@@ -30,7 +30,7 @@ logger.setLevel(logging.DEBUG)
 __conhandler = logging.StreamHandler()
 __conhandler.setLevel(logging.DEBUG)
 # 文件
-__filehandler = RotatingFileHandler(filename=__log_path, backupCount=10, encoding='utf-8', mode='a+', maxBytes=1*__1M)
+__filehandler = RotatingFileHandler(filename=__log_path, backupCount=10, encoding='utf-8', mode='a+', maxBytes=1*MB)
 __filehandler.setLevel(logging.INFO)
 
 # 格式化器

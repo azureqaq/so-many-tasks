@@ -10,6 +10,9 @@
 
 from apscheduler.triggers.interval import IntervalTrigger
 
+# logger
+from tools import info, debug, logexception
+
 import time
 
 # 必须以 tr 命名, 具体规则自定
@@ -27,5 +30,9 @@ def task(settings:dict):
     此tasks的入口\n
     settings来源于配置文件中的settings
     '''
-    print(time.time())
-    print(f'配置参数:{settings}')
+    try:
+        _time = time.strftime(r'%H:%M:%S', time.localtime())
+        info(f'{_time}\t参数：{settings}')
+        
+    except Exception as e:
+        logexception(e)

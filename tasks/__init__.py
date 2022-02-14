@@ -72,7 +72,7 @@ def add_to_scheduler(name:str):
         info(f'加入任务：{im_name}')
     except Exception as e:
         logexception(e)
-        debug(TasksHelper.TASK_FORM)
+        error(TasksHelper.TASK_FORM)
 
 
 def refresh_scheduler():
