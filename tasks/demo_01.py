@@ -16,7 +16,7 @@ from tools import info, debug, logexception
 import time
 
 # 必须以 tr 命名, 具体规则自定
-tr = IntervalTrigger(seconds=1)
+tr = IntervalTrigger(seconds=30)
 
 
 '''

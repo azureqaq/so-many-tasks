@@ -45,7 +45,7 @@ def configfile_refresh():
             need_add.append(name)
     # 加入需要加入的配置
     for name in need_add:
-        TaskConfig(name, True, {'default':'default'}).update_json()
+        TaskConfig(name, False, {'default':'default'}).update_json()
     # 如果没有对应的文件那么就删除对应配置文件
     for name in config_file.alltasksconfig.keys():
         if name not in names:
@@ -55,6 +55,13 @@ def configfile_refresh():
 
 def add_to_scheduler(name:str):
     '''加入任务到任务列表-无视 enable '''
+    job_names = set()
+    for _job in scheduler.get_jobs():
+        _job:Job
+        job_names.add(_job.name)
+    if name in job_names:
+        info(f'任务 {name} 已经存在，无需添加')
+        return
     # 包名称
     im_name = f'tasks.{name}'
     # 读取配置参数
