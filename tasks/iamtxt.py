@@ -18,6 +18,7 @@ from re import findall
 class IamTxtError(Exception):...
 
 class LoginError(IamTxtError):...
+class LogoutError(IamTxtError):...
 
 
 # 每天2点
@@ -114,9 +115,7 @@ class IamTxt(object):
             logout_bt:WebElement = self.driver.find_element_by_xpath(Command.LOGOUT_XPATH)
             logout_bt.click()
             info(f'注销登录的账号：{name_es}')
-
-        # 再检查一遍
-        return self.logout()
+            raise LogoutError('登出失败')
     
     def get_points(self):
         '''获取积分'''
