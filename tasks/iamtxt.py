@@ -127,7 +127,7 @@ class IamTxt(object):
         point_es:str = point_e.text
         point_es = findall(r'分(.*)?点', point_es)[0]
         point_es = point_es.strip()
-        return point_es
+        return findall(r'\d+', point_es)[0]
 
 
     def signin(self):
