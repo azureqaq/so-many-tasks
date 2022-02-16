@@ -8,7 +8,7 @@
 
 class Version(object):
     # 版本号，如果带有beta字符则为测试版
-    VERSION = '1.0'
+    VERSION = '1.0_beta'
     # 发布日期 年-月-日
     RELEASE = '2022-2-15'
 
