@@ -13,6 +13,12 @@ from tools import info, debug, warn, error, logexception, critical
 from typing import Dict
 from retry import retry
 from time import sleep
+from re import findall
+
+class IamTxtError(Exception):...
+
+class LoginError(IamTxtError):...
+
 
 # 每天2点
 tr = CronTrigger(hour=2)
@@ -21,8 +27,22 @@ class Command(object):
     '''command'''
     LOGIN_URL = r'https://www.iamtxt.com/e/member/login/log.html'
     HOME_URL = r'https://www.iamtxt.com/'
+    SETTINGS_URL = r'https://www.iamtxt.com/e/member/cp/'
 
+    # 账号输入框
     NAME_XPATH = r'/html/body/div[1]/div[1]/div/form/div[2]/input'
+    # 密码输入框
+    PWD_XPATH = r'/html/body/div[1]/div[1]/div/form/div[3]/input'
+    # 登录按钮
+    SUBMIT_XPATH = r'/html/body/div[1]/div[1]/div/form/div[5]/input'
+    # 设置界面中，用户名位置
+    NAME_XPATH = r'/html/body/div[1]/div[1]/div[1]/div[2]'
+    # 设置界面，注销登录按钮
+    LOGOUT_XPATH = r'/html/body/div[1]/div[2]/div/div[6]/a'
+    # 签到按钮
+    SIGNIN_XPATH = r'//*[@id="signin"]'
+    # 设置页面，积分信息
+    POINTS_XPATH = r'/html/body/div[1]/div[1]/div[2]'
 
 
 class IamTxt(object):
@@ -45,15 +65,98 @@ class IamTxt(object):
         info(f'登录iamtxt {name}')
         debug('打开登录网页')
         self.driver.get(Command.LOGIN_URL)
+        # 等一会儿，可能别的地方没退出
+        sleep(3)
+        self.driver.refresh()
         # 输入name pwd
         name_bt:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
+        name_bt.clear()
+        debug(f'输入账户:{name}')
+        name_bt.send_keys(name)
+        # 输入密码
+        pwd_bt:WebElement = self.driver.find_element_by_xpath(Command.PWD_XPATH)
+        pwd_bt.clear()
+        debug('输入对应密码')
+        pwd_bt.send_keys(pwd)
+        # 点击登录按钮
+        submit_bt:WebElement = self.driver.find_element_by_xpath(Command.SUBMIT_XPATH)
+        submit_bt.click()
+        debug('点击登录按钮')
+        # 检查是否登录成功
+        # 打开设置网址
+        self.driver.get(Command.SETTINGS_URL)
+        name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
+        if name in name_e.text:
+            info(f'{name} 登录成功')
+        else:
+            error(f'{name} 登录失败')
+            raise LoginError('登录失败')
+    
+    @retry(tries=3)
+    def logout(self):
+        '''登出'''
+        debug('注销登录')
+        # 打开设置页面
+        self.driver.get(Command.SETTINGS_URL)
+        sleep(2)
+        self.driver.refresh()
+        sleep(2)
+        if self.driver.current_url == Command.LOGIN_URL:
+            info('未登录账号！')
+            return
+        else:
+            info('登出账号')
+            name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
+            name_es:str = name_e.text
+            name_es = name_es.replace('修改头像', '')
+            # 点击退出按钮
+            logout_bt:WebElement = self.driver.find_element_by_xpath(Command.LOGOUT_XPATH)
+            logout_bt.click()
+            info(f'注销登录的账号：{name_es}')
+
+        # 再检查一遍
+        return self.logout()
+    
+    def get_points(self):
+        '''获取积分'''
+        # 打开设置页面
+        self.driver.get(Command.SETTINGS_URL)
+        self.driver.refresh()
+        point_e:WebElement = self.driver.find_element_by_xpath(Command.POINTS_XPATH)
+        point_es:str = point_e.text
+        point_es = findall(r'分(.*)?点', point_es)[0]
+        point_es = point_es.strip()
+        return point_es
+
+
+    def signin(self):
+        '''给他们都签到上！'''
+        # 遍历每一个账号
+        for name, pwd in self.users.items():
+            # 登录
+            self.login(name, pwd)
+            p_ = self.get_points()
+            debug(f'签到前积分：{p_}')
+            # 签到
+            signin_bt:WebElement = self.driver.find_element_by_xpath(Command.SIGNIN_XPATH)
+            debug('点击签到按钮')
+            signin_bt.click()
+            e_ = self.get_points()
+            info(f'签到后积分：{e_}')
+            if p_ == e_:
+                info(f'{name} 签到失败')
+            else:
+                info(f'{name} 签到成功')
+            # 登出
+            self.logout()
+        info('本轮iamtxt签到完成')
 
 
 
 def task(settings:Dict[str, str]):
     '''task'''
     try:
-        pass
+        IamTxt(settings).signin()
 
     except Exception as e:
         logexception(e)
