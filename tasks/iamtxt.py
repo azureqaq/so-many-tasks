@@ -12,6 +12,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from tools import info, debug, warn, error, logexception, critical
 from typing import Dict
 from retry import retry
+from time import sleep
 
 # 每天2点
 tr = CronTrigger(hour=2)
@@ -20,6 +21,8 @@ class Command(object):
     '''command'''
     LOGIN_URL = r'https://www.iamtxt.com/e/member/login/log.html'
     HOME_URL = r'https://www.iamtxt.com/'
+
+    NAME_XPATH = r'/html/body/div[1]/div[1]/div/form/div[2]/input'
 
 
 class IamTxt(object):
@@ -40,11 +43,10 @@ class IamTxt(object):
     def login(self, name:str, pwd:str):
         '''登录iamtxt'''
         info(f'登录iamtxt {name}')
+        debug('打开登录网页')
         self.driver.get(Command.LOGIN_URL)
-    
-    def check_login(self):
-        '''检查登录状态'''
-        self.driver.get(Command.HOME_URL)
+        # 输入name pwd
+        name_bt:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
 
 
 
