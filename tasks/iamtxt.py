@@ -87,7 +87,7 @@ class IamTxt(object):
         # 打开设置网址
         self.driver.get(Command.SETTINGS_URL)
         name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_STR_XPATH)
-        if name in name_e.text:
+        if name.lower() in name_e.text.lower():
             info(f'{name} 登录成功')
         else:
             error(f'{name} 登录失败')
@@ -109,7 +109,7 @@ class IamTxt(object):
             info('登出账号')
             name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_STR_XPATH)
             name_es:str = name_e.text
-            name_es = name_es.replace('修改头像', '')
+            name_es = name_es.replace('修改头像', '').strip()
             # 点击退出按钮
             logout_bt:WebElement = self.driver.find_element_by_xpath(Command.LOGOUT_XPATH)
             logout_bt.click()
