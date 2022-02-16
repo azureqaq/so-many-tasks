@@ -6,13 +6,14 @@
 # 作者: Azure
 # 版本: 1.0
 
-from time import localtime, sleep, strftime
+from time import sleep
 
 from apscheduler.job import Job
 
 from tasks import (add_to_scheduler, configfile_refresh, get_all_tasks_name,
                    refresh_scheduler, scheduler)
 from tools import critical, debug, error, info, logexception, warn
+from version import hello
 
 
 def main():
@@ -121,6 +122,7 @@ def main():
 
 if __name__ == '__main__':
     '''main'''
+    hello()
     info(' S T A R T ')
     try:
         main()
