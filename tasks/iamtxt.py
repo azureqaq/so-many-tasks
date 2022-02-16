@@ -36,7 +36,7 @@ class Command(object):
     # 登录按钮
     SUBMIT_XPATH = r'/html/body/div[1]/div[1]/div/form/div[5]/input'
     # 设置界面中，用户名位置
-    NAME_XPATH = r'/html/body/div[1]/div[1]/div[1]/div[2]'
+    NAME_STR_XPATH = r'/html/body/div[1]/div[1]/div[1]/div[2]'
     # 设置界面，注销登录按钮
     LOGOUT_XPATH = r'/html/body/div[1]/div[2]/div/div[6]/a'
     # 签到按钮
@@ -68,6 +68,7 @@ class IamTxt(object):
         # 等一会儿，可能别的地方没退出
         sleep(3)
         self.driver.refresh()
+        self.driver.get(Command.LOGIN_URL)
         # 输入name pwd
         name_bt:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
         name_bt.clear()
@@ -85,7 +86,7 @@ class IamTxt(object):
         # 检查是否登录成功
         # 打开设置网址
         self.driver.get(Command.SETTINGS_URL)
-        name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
+        name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_STR_XPATH)
         if name in name_e.text:
             info(f'{name} 登录成功')
         else:
@@ -106,7 +107,7 @@ class IamTxt(object):
             return
         else:
             info('登出账号')
-            name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_XPATH)
+            name_e:WebElement = self.driver.find_element_by_xpath(Command.NAME_STR_XPATH)
             name_es:str = name_e.text
             name_es = name_es.replace('修改头像', '')
             # 点击退出按钮
@@ -163,3 +164,6 @@ def task(settings:Dict[str, str]):
 
 def test():
     '''test'''
+    from tools.tasksconfigparser import ConfigFile
+    configs = ConfigFile().getconfig('iamtxt').settings
+    IamTxt(configs).signin()
