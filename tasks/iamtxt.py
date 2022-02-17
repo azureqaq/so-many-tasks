@@ -149,6 +149,8 @@ class IamTxt(object):
                 info(f'{name} 签到成功')
             # 登出
             self.logout()
+            # 清楚cooikes
+            self.driver.delete_all_cookies()
         info('本轮iamtxt签到完成')
 
 
