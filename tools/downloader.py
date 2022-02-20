@@ -13,6 +13,7 @@ from .command import *
 from .exception import *
 
 from requests import Session
+from concurrent.futures import ThreadPoolExecutor, as_completed, ALL_COMPLETED, wait
 from os.path import exists
 from os import makedirs
 from retry import retry
@@ -91,5 +92,28 @@ class Downloader(object):
         # session初始化
         self.session = Session()
         self.session.headers.update(DownloaderCommand.FAKE_UA)
-
+        # TP
+        self.tp = ThreadPoolExecutor(max_workers=10)
     
+    @retry(tries=3)
+    def download_one_pic(self, pic:Picture):
+        '''下载一个图片'''
+        req = self.session.get(pic.url, stream=False, timeout=5)
+        pic.status = PicStatus.DOWNLOADING
+        if req.ok:
+            with open(pic.path, 'wb') as fr:
+                fr.write(req.content)
+            pic.status = PicStatus.DOWNLOADED
+        else:
+            pic.status = PicStatus.FAILED
+            pic.reason = Reason.NETWORK_ERROR
+            raise NetWorkError(f'网络错误：{pic}')
+    
+    def run(self):
+        '''开始下载'''
+        alltasks = []
+        for pic in self.pictures:
+            alltasks.append(self.tp.submit(self.download_one_pic, pic))
+        # 等待下载完成
+        wait(alltasks, return_when=ALL_COMPLETED)
+        return
