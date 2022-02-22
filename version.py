@@ -25,7 +25,8 @@ class Version(object):
     # 发布说明
     NOTE = r'''
     1. 发布最初版本；
-    2. '''
+    2. spider分支;
+    3. iamtxt每日签到;'''
 
 
 def hello():
