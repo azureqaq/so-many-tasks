@@ -107,11 +107,14 @@ def task(settings:dict):
     settings来源于配置文件中的settings
     '''
     try:
-        
+        info('开始 iamtxt 签到')
         for i, y in settings.items():
             txt = Iamtxt()
             txt.login(i, y)
             txt.done()
         
+        
     except Exception as e:
         logexception(e)
+    finally:
+        info('iamtxt 今天的任务完成啦！')
