@@ -42,9 +42,9 @@ def task(settings:dict):
     '''
     try:
         '''每小时更新一次表'''
-        info('每小时刷新一次任务列表')
+        debug('每小时刷新一次任务列表')
         refresh_scheduler()
-        info('刷新完成')
+        debug('刷新完成')
         
         
     except Exception as e:

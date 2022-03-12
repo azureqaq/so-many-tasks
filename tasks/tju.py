@@ -10,13 +10,16 @@
 
 from apscheduler.triggers.cron import CronTrigger
 
-# logger
+import china_idiom as idiom
+from lxml import etree
+from lxml.etree import _Element
 from tools import info, debug, logexception
 from requests import Session
 from tools.command import DownloaderCommand
 from retry import retry
 
-class LoginError(Exception):...
+class TjuPtError(Exception):...
+class LoginError(TjuPtError):...
 
 
 # 必须以 tr 命名, 具体规则自定
@@ -60,6 +63,35 @@ class Tjupt(object):
         else:
             raise LoginError(f'{self.name} 登录失败')
 
+    @retry(tries=3)
+    def comm(self, con:str):
+        '''评论帖子'''
+        data = {
+            'id': '15223',
+            'type': 'reply',
+            'body': con
+        }
+        req = self.session.post('https://tjupt.org/forums.php?action=post', data=data, timeout=5)
+        if req.ok and '' in req.text:
+            info(f'评论成功: {con}')
+        else:
+            raise TjuPtError(f'评论 {con} 失败')
+    
+    def find_list(self):
+        '''找出已经存在的list'''
+        # 先查找页码
+        def page(p:int):
+            return f'https://tjupt.org/forums.php?action=viewtopic&topicid=15223&page={p-1}'
+        html = self.session.get(page(1), timeout=5).text
+        tree:_Element = etree.HTML(html)
+        page_all:str = tree.xpath('//p[@class="pagertop"]/a[6]/b/text()')[0].strip()
+        page_all = int(page_all)
+        # 获取最新一页的
+        html = self.session.get(page(page_all), timeout=5).text
+        tree:_Element = etree.HTML(html)
+        # 查找这一页所有的成语
+        
+    
 
 # 必须以task命名, settings必须以此命名
 def task(settings:dict):
