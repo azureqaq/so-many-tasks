@@ -72,7 +72,7 @@ class Tjupt(object):
             'body': con
         }
         req = self.session.post('https://tjupt.org/forums.php?action=post', data=data, timeout=5)
-        if req.ok and '' in req.text:
+        if req.ok:
             info(f'评论成功: {con}')
         else:
             raise TjuPtError(f'评论 {con} 失败')
@@ -90,6 +90,8 @@ class Tjupt(object):
         html = self.session.get(page(page_all), timeout=5).text
         tree:_Element = etree.HTML(html)
         # 查找这一页所有的成语
+
+        print(html)
         
     
 
