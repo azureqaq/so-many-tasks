@@ -34,11 +34,11 @@ def linux_command(command:str):
 # screen 名称
 SCREEN_NAME = r'somanytasks'
 # 用户名
-WHO = linux_command('echo %USER').stdout.strip()
+WHO = linux_command('echo $USER').stdout.strip()
 
 # 检查是否开启，如果开启则跳过
 _allscreen = linux_command('screen -ls')
-if _allscreen.returncode == 0:
+if _allscreen.returncode != 0:
     _allscreen = _allscreen.stdout.strip()
     if re.match(f'(.*)?{SCREEN_NAME}', _allscreen):
         info('已经存在无需重复开启')
