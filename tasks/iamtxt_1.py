@@ -118,3 +118,15 @@ def task(settings:dict):
         logexception(e)
     finally:
         info('iamtxt 今天的任务完成啦！')
+
+def test():
+    '''
+    测试.
+    '''
+    info('iamtxt_1 测试...')
+    from tools.tasksconfigparser import ConfigFile
+
+    fil = ConfigFile().getconfig('iamtxt_1')
+    sett = fil.settings
+    return task(sett)
+
