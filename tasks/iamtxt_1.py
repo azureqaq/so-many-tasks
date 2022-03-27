@@ -10,19 +10,11 @@
 用requests
 '''
 
-from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
 from requests import Session
-from tools.command import DownloaderCommand
-from lxml import etree
-from lxml.etree import _Element
-from typing import List
 from retry import retry
-
-# logger
-from tools import info, debug, logexception, error
-
-# import time
+from tools import error, info, logexception
+from tools.command import DownloaderCommand
 
 # 必须以 tr 命名, 具体规则自定
 tr = CronTrigger(hour=13)
