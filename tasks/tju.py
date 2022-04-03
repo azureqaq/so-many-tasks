@@ -12,7 +12,7 @@ from re import compile, findall
 from typing import List, Union
 
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.combining import BaseCombiningTrigger
+from apscheduler.triggers.combining import OrTrigger
 from random import randint
 from lxml import etree
 from lxml.etree import _Element
@@ -36,7 +36,7 @@ tr4 = CronTrigger(hour=16, minute=31)
 tr5 = CronTrigger(hour=18, minute=31)
 tr6 = CronTrigger(hour=20, minute=31)
 tr7 = CronTrigger(hour=22, minute=31)
-tr = BaseCombiningTrigger(
+tr = OrTrigger(
     [
         tr1,
         tr2,
