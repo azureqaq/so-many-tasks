@@ -12,12 +12,16 @@ from re import compile, findall
 from typing import List, Union
 
 from apscheduler.triggers.cron import CronTrigger
+from random import randint
 from lxml import etree
 from lxml.etree import _Element
+from pypinyin import lazy_pinyin
+import china_idiom as idiom
 from requests import Session
 from retry import retry
 from tools import debug, info, logexception, warn
 from tools.command import SpiderCommand as Command
+from time import sleep
 
 
 class TjuptError(Exception):...
@@ -142,10 +146,42 @@ class TjuPt(object):
                 chengyus.append(i)
             else:
                 res:List[str] = findall(p, i.strip())
-                
-                chengyus.append('***'.join(res))
+                chengyus.append(''.join(res))
         
-        print(chengyus)
+        if len(chengyus) == 0:
+            warn('未找到可用列表')
+            return
+        elif chengyus[-1] is None:
+            warn('最后一个是None')
+            return
+        else:
+            # 找到最后一个成语的第一个的字的拼音
+            _l = chengyus[-1][-1]
+            _l_py = lazy_pinyin(chengyus[-1][0])[0]
+            # 新的成语
+            ido = idiom.search_idiom(_l, 1, 5)
+            if len(ido) == 0:
+                raise TopicError('接不出来')
+            # 如果新的成语列表最后一个字的pinyin和第一个相同跳过，如果不是4跳过
+            res = []
+            for i in ido:
+                if len(i) != 4:
+                    continue
+                if lazy_pinyin(chengyus[-1][0])[0] == lazy_pinyin(i[-1])[0]:
+                    continue
+                else:
+                    res.append(i)
+            if len(ido) == 1:
+                ne = ido[0]
+            elif not len(res):
+                # 如果没有合格的
+                ne = ido[randint(0, len(ido)-1)]
+            elif len(res) == 1:
+                ne = res[0]
+            else:
+                ne = res[randint(0, len(res)-1)]
+            # 开始接龙
+            self.reply('15223', ne)
 
 
 
@@ -157,21 +193,23 @@ def task(settings:dict):
     此tasks的入口\n
     settings来源于配置文件中的settings
     '''
-    try:
-        tju = TjuPt('azureqaq', 'Bb155469239-')
+    def _in():
+        tju = TjuPt(settings.get('name'), settings.get('pwd'))
         tju.login()
-        
+        s = tju.viewtopic('15223', 'last')
+        tju.chengyujielong(s)
+    try:
+        for i in range(5):
+            print(f'第{i}次')
+            _in()
+            
     except Exception as e:
         logexception(e)
 
 def test():
     '''测试'''
     try:
-        tju = TjuPt('azureqaq', 'Bb155469239-')
-        tju.login()
-        s = tju.viewtopic('15223', '999')
-        tju.chengyujielong(s)
-        # tju.reply('15223', '岌岌可危')
+        pass
         
     except Exception as e:
         raise e
