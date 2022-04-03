@@ -12,6 +12,7 @@ from re import compile, findall
 from typing import List, Union
 
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.combining import BaseCombiningTrigger
 from random import randint
 from lxml import etree
 from lxml.etree import _Element
@@ -28,7 +29,24 @@ class AskurlError(TjuptError):...
 class TopicError(TjuptError):...
 
 # 必须以 tr 命名, 具体规则自定
-tr = CronTrigger(hour=13, minute=31)
+tr1 = CronTrigger(hour=10, minute=31)
+tr2 = CronTrigger(hour=12, minute=31)
+tr3 = CronTrigger(hour=14, minute=31)
+tr4 = CronTrigger(hour=16, minute=31)
+tr5 = CronTrigger(hour=18, minute=31)
+tr6 = CronTrigger(hour=20, minute=31)
+tr7 = CronTrigger(hour=22, minute=31)
+tr = BaseCombiningTrigger(
+    [
+        tr1,
+        tr2,
+        tr3,
+        tr4,
+        tr5,
+        tr6,
+        tr7
+    ]
+)
 
 
 class TjuPt(object):
