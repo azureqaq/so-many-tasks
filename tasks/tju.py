@@ -209,7 +209,9 @@ def task(settings:dict):
 def test():
     '''测试'''
     try:
-        pass
+        from tools.tasksconfigparser import ConfigFile
+        sett = ConfigFile().getconfig('tju').settings
+        return task(sett)
         
     except Exception as e:
         raise e
