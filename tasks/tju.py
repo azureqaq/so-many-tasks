@@ -195,12 +195,13 @@ def task(settings:dict):
     def _in():
         tju = TjuPt(settings.get('name'), settings.get('pwd'))
         tju.login()
-        for _i in range(4):
-            print(f'第{_i+1}次')
-            s = tju.viewtopic('15223', 'last')
-            tju.chengyujielong(s)
+        s = tju.viewtopic('15223', 'last')
+        tju.chengyujielong(s)
     try:
-        _in()
+        for i in range(3):
+            debug(f'第{i+1}次')
+            _in()
+            sleep(3)
             
     except Exception as e:
         logexception(e)
