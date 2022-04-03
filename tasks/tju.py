@@ -111,7 +111,6 @@ class TjuPt(object):
         for i in items:
             res.append(i.text)
         
-        print(res)
         return res
     
     def reply(self, topicid:str, content:str):
@@ -196,12 +195,12 @@ def task(settings:dict):
     def _in():
         tju = TjuPt(settings.get('name'), settings.get('pwd'))
         tju.login()
-        s = tju.viewtopic('15223', 'last')
-        tju.chengyujielong(s)
+        for _i in range(4):
+            print(f'第{_i+1}次')
+            s = tju.viewtopic('15223', 'last')
+            tju.chengyujielong(s)
     try:
-        for i in range(5):
-            print(f'第{i}次')
-            _in()
+        _in()
             
     except Exception as e:
         logexception(e)
