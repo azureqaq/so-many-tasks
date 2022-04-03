@@ -26,7 +26,7 @@ class TasksConfigParserCommand(Command):
     SETTINGS = 'settings'
 
 
-class DownloaderCommand(Command):
+class SpiderCommand(Command):
     '''toos.下载器'''
     FAKE_UA = {
         "User-Agent":

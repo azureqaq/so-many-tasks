@@ -91,7 +91,7 @@ class Downloader(object):
 
         # session初始化
         self.session = Session()
-        self.session.headers.update(DownloaderCommand.FAKE_UA)
+        self.session.headers.update(SpiderCommand.FAKE_UA)
         # TP
         self.tp = ThreadPoolExecutor(max_workers=10)
     

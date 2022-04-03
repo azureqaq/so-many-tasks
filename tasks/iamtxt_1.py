@@ -14,7 +14,7 @@ from apscheduler.triggers.cron import CronTrigger
 from requests import Session
 from retry import retry
 from tools import error, info, logexception
-from tools.command import DownloaderCommand
+from tools.command import SpiderCommand
 
 # 必须以 tr 命名, 具体规则自定
 tr = CronTrigger(hour=13)
@@ -24,7 +24,7 @@ class LoginError(Exception):...
 class Iamtxt(object):
     def __init__(self) -> None:
         self.session = Session()
-        self.session.headers.update(DownloaderCommand.FAKE_UA)
+        self.session.headers.update(SpiderCommand.FAKE_UA)
     
     @retry(tries=3)
     def login(self, name:str, pwd:str):
