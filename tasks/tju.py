@@ -21,7 +21,6 @@ from requests import Session
 from retry import retry
 from tools import debug, info, logexception, warn
 from tools.command import SpiderCommand as Command
-from time import sleep
 
 
 class TjuptError(Exception):...
@@ -113,6 +112,7 @@ class TjuPt(object):
         
         return res
     
+
     def reply(self, topicid:str, content:str):
         '''
         回复消息.
@@ -147,6 +147,7 @@ class TjuPt(object):
                 res:List[str] = findall(p, i.strip())
                 chengyus.append(''.join(res))
         
+        debug(f'已经存在的列表:{chengyus}')
         if len(chengyus) == 0:
             warn('未找到可用列表')
             return
@@ -192,16 +193,14 @@ def task(settings:dict):
     此tasks的入口\n
     settings来源于配置文件中的settings
     '''
+    @retry(tries=3)
     def _in():
         tju = TjuPt(settings.get('name'), settings.get('pwd'))
         tju.login()
         s = tju.viewtopic('15223', 'last')
         tju.chengyujielong(s)
     try:
-        for i in range(3):
-            debug(f'第{i+1}次')
-            _in()
-            sleep(3)
+        _in()
             
     except Exception as e:
         logexception(e)
