@@ -214,7 +214,7 @@ class TjuPt(object):
             error('未查询到魔力值')
             moli = None
         else:
-            moli = moli[0].replace(']: ', '')
+            moli = moli[0].replace(']: ', '').strip()
         
         # 寻找hnr
         hnr:List[str] = html.xpath('//a[@href="/hnr_bonus.php"][2]/text()')
