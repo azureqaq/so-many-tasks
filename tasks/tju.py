@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
 # 文件: demo_01.py
-# 说明: 
+# 说明:
 # 时间: 2022/02/14 18:06:29
 # 作者: Azure
 # 版本: 1.0
@@ -20,7 +20,7 @@ from pypinyin import lazy_pinyin
 import china_idiom as idiom
 from requests import Session
 from retry import retry
-from tools import debug, info, logexception, warn
+from tools import debug, info, logexception, warn, error
 from tools.command import SpiderCommand as Command
 
 
@@ -80,7 +80,7 @@ class TjuPt(object):
         self.pwd = pwd
         self.session = Session()
         self.session.headers.update(Command.FAKE_UA)
-    
+
     def __askurl(self, url:str, par:dict={}, head:dict={}):
         '''
         获取网页内容.
@@ -95,7 +95,7 @@ class TjuPt(object):
             return req.content
         else:
             raise AskurlError(f'访问{url}失败')
-    
+
     def login(self):
         '''登陆'''
         loginurl = 'https://tjupt.org/takelogin.php'
@@ -111,7 +111,7 @@ class TjuPt(object):
         else:
             warn(f'{self.name}登陆失败')
             raise AskurlError(f'{self.name}登陆失败')
-    
+
 
     def viewtopic(self, topicid:str, page:str):
         '''
@@ -127,9 +127,9 @@ class TjuPt(object):
             raise TopicError(f'无法获取有效信息:{topicid}')
         for i in items:
             res.append(i.text)
-        
+
         return res
-    
+
 
     def reply(self, topicid:str, content:str):
         '''
@@ -148,7 +148,7 @@ class TjuPt(object):
         else:
             warn(f'评论失败{topicid} {content}')
             raise TopicError(f'评论失败{topicid} {content}')
-        
+
 
     def chengyujielong(self, chengyulist:Union[List[str], None]):
         '''
@@ -164,7 +164,7 @@ class TjuPt(object):
             else:
                 res:List[str] = findall(p, i.strip())
                 chengyus.append(''.join(res))
-        
+
         debug(f'已经存在的列表:{chengyus}')
         if len(chengyus) == 0:
             warn('未找到可用列表')
@@ -175,11 +175,11 @@ class TjuPt(object):
         else:
             # 找到最后一个成语的第一个的字的拼音
             _l = chengyus[-1][-1]
-            _l_py = lazy_pinyin(chengyus[-1][0])[0]
             # 新的成语
             ido = idiom.search_idiom(_l, 1, 5)
             if len(ido) == 0:
-                raise TopicError('接不出来')
+                error('接不出来')
+                return
             # 如果新的成语列表最后一个字的pinyin和第一个相同跳过，如果不是4跳过
             res = []
             for i in ido:
@@ -201,6 +201,29 @@ class TjuPt(object):
             # 开始接龙
             self.reply('15223', ne)
 
+    def get_moli(self):
+        '''获取魔力值和HnR'''
+        # 获取魔力值
+        # 首页
+        indexurl = 'https://tjupt.org/index.php'
+        # 访问首页
+        con = self.__askurl(indexurl)
+        html:_Element = etree.HTML(con)
+        moli:List[str] = html.xpath('//a[text()="茉莉园"]/following-sibling::text()[1]')
+        if not len(moli):
+            error('未查询到魔力值')
+            moli = None
+        else:
+            moli = moli[0].replace(']: ', '')
+        
+        # 寻找hnr
+        hnr:List[str] = html.xpath('//a[@href="/hnr_bonus.php"][2]/text()')
+        if not len(hnr):
+            error('为查找到HnR积分')
+            hnr = None
+        else:
+            hnr = hnr[0]
+        info(f'魔力值：{moli}; HnR积分：{hnr}')
 
 
 
@@ -217,9 +240,10 @@ def task(settings:dict):
         tju.login()
         s = tju.viewtopic('15223', 'last')
         tju.chengyujielong(s)
+        tju.get_moli()
     try:
         _in()
-            
+
     except Exception as e:
         logexception(e)
 
@@ -229,6 +253,6 @@ def test():
         from tools.tasksconfigparser import ConfigFile
         sett = ConfigFile().getconfig('tju').settings
         return task(sett)
-        
+
     except Exception as e:
         raise e
