@@ -10,12 +10,14 @@
 
 from re import compile, findall
 from typing import List, Union
+from os.path import isfile
 
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.combining import OrTrigger
 from random import randint
 from lxml import etree
 from lxml.etree import _Element
+from time import sleep
 from pypinyin import lazy_pinyin
 import china_idiom as idiom
 from requests import Session
@@ -224,7 +226,40 @@ class TjuPt(object):
         else:
             hnr = hnr[0]
         info(f'魔力值：{moli}; HnR积分：{hnr}')
+    
+    def thanks(self, id:str):
+        '''
+        说谢谢.
+        :param id: ID.
+        '''
+        __url = 'https://tjupt.org/thanks.php'
+        __data = {
+            'id': id.strip()
+        }
+        req = self.session.post(__url, data=__data)
+        return req.ok
 
+    def thanks_all(self):
+        '''
+        更新种子.
+        '''
+        txt = './temp/tju_thanks.txt'
+        last = 1
+        if not isfile(txt):
+            with open(txt, mode='w', encoding='utf-8') as fr:
+                fr.write('1')
+        # 读取之前的
+        with open(txt, 'r', encoding='utf-8') as fr:
+            last = int(fr.read().strip())
+        for i in range(last, last+100):
+            # sleep(3)
+            if self.thanks(str(i)):
+                debug(f'{i}谢谢！')
+            else:
+                debug(f'{i}谢谢失败')
+        with open(txt, 'w', encoding='utf-8') as fr:
+            fr.write(str(last+100))
+        
 
 
 
@@ -240,6 +275,7 @@ def task(settings:dict):
         tju.login()
         s = tju.viewtopic('15223', 'last')
         tju.chengyujielong(s)
+        tju.thanks_all()
         tju.get_moli()
     try:
         _in()
