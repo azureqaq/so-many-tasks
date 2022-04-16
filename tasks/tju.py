@@ -252,7 +252,7 @@ class TjuPt(object):
         with open(txt, 'r', encoding='utf-8') as fr:
             last = int(fr.read().strip())
         for i in range(last, last+100):
-            # sleep(3)
+            sleep(3)
             if self.thanks(str(i)):
                 debug(f'{i}谢谢！')
             else:
