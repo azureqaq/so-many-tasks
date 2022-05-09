@@ -29,6 +29,7 @@ from tools.command import SpiderCommand as Command
 class TjuptError(Exception):...
 class AskurlError(TjuptError):...
 class TopicError(TjuptError):...
+class LoginError(TjuptError):...
 
 # 必须以 tr 命名, 具体规则自定
 tr1 = CronTrigger(hour=10, minute=31)
@@ -106,7 +107,12 @@ class TjuPt(object):
             'password': self.pwd,
             'logout': '7days'
         }
-        req = self.session.post(loginurl, data, headers=Command.FAKE_UA)
+        try:
+            req = self.session.post(loginurl, data, headers=Command.FAKE_UA, timeout=5)
+        except:
+            _e = f'登录失败：{self.name}'
+            error(_e)
+            raise LoginError(_e)
         req.encoding = 'utf-8'
         if req.ok and self.name in req.text:
             info(f'{self.name}登陆成功')
